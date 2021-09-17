@@ -7,6 +7,7 @@ const socketio = require('socket.io');
 const { url } = require('inspector');
 
 const reply = require('./helpers/chatReply')
+
 //manggil server
 const app = express();
 const server = http.createServer(app);
@@ -76,68 +77,21 @@ const media8 = MessageMedia.fromFilePath('./images/Image8.jpeg');
 const media9 = MessageMedia.fromFilePath('./images/Image9.jpeg');
 
 
+const db = require('./helpers/chatReply')
+
 client.on('message', async msg => {
     const keyword = msg.body;
-    const replyAwal = await reply.awal(keyword)
-    const replySatu = await reply.satu(keyword)
-    const replyDua = await reply.dua(keyword)
-    const replyTiga = await reply.tiga(keyword)
-    const replyEmpat = await reply.empat(keyword)
-    const replyLima = await reply.lima(keyword)
-    const replyEnam = await reply.enam(keyword)
-    const replyTujuh = await reply.tujuh(keyword)
-    const yesReply = await reply.replyYes(keyword)
-    const dataUsers = await reply.usersDatareply(keyword)
+    const replydata = await db.getData(keyword)
+    const showallData = await db.getallData(keyword)
     const imageReply = await reply.replyImage(keyword)
+    const yesReply = await reply.replyYes(keyword)
 
-    switch (keyword) {
-        case "Hai":
-        case "B":
-            msg.reply(replyAwal);
-            break;
-        case "1":
-            msg.reply(replySatu);
-            break;
-        case "2":
-            msg.reply(replyDua);
-            break;
-        case "3":
-            msg.reply(replyTiga);
-            break;
-        case "4":
-            msg.reply(replyEmpat);
-            break;
-        case "5":
-            msg.reply(replyLima);
-            break;
-        case "6":
-            msg.reply(replyEnam);
-            break;
-        case "7":
-            msg.reply(replyTujuh);
-            break;
-        case 'Y':
-        case 'yes':
-            msg.reply(yesReply);
-            break;
-        case 'M':
-            msg.reply(dataUsers);
-            break;
-        case 'Ibnu':
-            msg.reply(dataUsers);
-            break;
-        case 'Bandung':
-            msg.reply(dataUsers);
-            break;
-        case 'Siang':
-            msg.reply(dataUsers);
-            break;
-        case 'S':
-            msg.reply(dataUsers);
-            break;
-        case 'G':
-            // client.sendMessage(msg.from, media);
-            msg.reply(imageReply)
+    if(showallData !== false){
+        msg.reply(showallData)
+    }else if(replydata !== false){
+        msg.reply(replydata)
+    }else if(keyword == 'G'){
+        msg.reply(imageReply)
             setTimeout(() => {
                 client.sendMessage(msg.from, media1)
                 client.sendMessage(msg.from, media2)
@@ -149,12 +103,10 @@ client.on('message', async msg => {
                 client.sendMessage(msg.from, media8)
                 client.sendMessage(msg.from, media9)
             }, 500);
-            
-        break;
-        default:
-            msg.reply('error input')
-            break;
+    }else if(keyword == 'Y' || keyword == 'Yes'){
+        msg.reply(yesReply);
     }
+    
 });
 
 client.initialize();
